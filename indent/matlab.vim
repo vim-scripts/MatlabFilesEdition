@@ -8,6 +8,7 @@ if exists("b:did_indent")
   finish
 endif
 let b:did_indent = 1
+let s:onlySubfunctionExists = 0
 
 setlocal indentexpr=GetMatlabIndent()
 setlocal indentkeys=!,o,O=end,=case,=else,=elseif,=otherwise,=catch
@@ -67,18 +68,33 @@ function GetMatlabIndent()
   " function, if, while, for, otherwise, case, tic, try, catch, else, elseif
   if getline(plnum) =~ '^\s*\(classdef\|properties\|switch\|methods\|events\|function\|if\|while\|for\|otherwise\|case\|tic\|try\|catch\|else\|elseif\)\>'
     let curind = curind + &sw
-    " TODO : in Matlab we have different kind of functions
+    " In Matlab we have different kind of functions
     " - the main function (the function with the same name than the filename)
     " - the nested functions
     " - the functions defined in methods (for classes)
     " - subfunctions
     " For the moment the main function (located line 1) doesn't produce any indentation in the
     " code (default behavior in the Matlab editor) and the other kind of
-    " functions indent the code (which is ok for nested and methods but not
-    " for subfunction)
-    if plnum == 1
-      if getline(plnum)  =~ '^\s*\function\>'
+    " functions indent the code
+    if getline(plnum)  =~ '^\s*\function\>'
+      " If it is the main function
+      if plnum == 1
+	" look for a matching end : 
+	" - if we find a matching end everything is fine
+	" - if not, then all other functions are subfunctions
+	normal %
+	if getline(line('.')) =~ '^\s*end'
+	  let s:onlySubfunctionExists = 0
+	else
+	  let s:onlySubfunctionExists = 1
+	endif
+	normal %
 	let curind = curind - &sw
+      else
+	" it is a subfunction without matching end : dedent
+	if s:onlySubfunctionExists
+	  let curind = curind - &sw
+	endif
       endif
     endif
   endif
@@ -86,6 +102,10 @@ function GetMatlabIndent()
   " Subtract a 'shiftwidth' on a else, elseif, end, catch, otherwise, case,
   " toc
   if getline(v:lnum) =~ '^\s*\(else\|elseif\|end\|catch\|otherwise\|case\|toc\)\>'
+    let curind = curind - &sw
+  endif
+  " No indentation in a subfunction
+  if getline(v:lnum)  =~ '^\s*\function\>' && s:onlySubfunctionExists
     let curind = curind - &sw
   endif
 
