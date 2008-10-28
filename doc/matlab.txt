@@ -43,9 +43,6 @@ the result of indentation compared to the one provided by the Matlab Editor.
 The only differences are :
 - block command on same line (if true, disp('ok'); end) are unsupported in
   this version
-- subfunctions are indented in the matlab.vim script (in the matlab editor
-  they are not); but the indentation of nested functions and methods is
-correct
 
 NOTE : to work correctly, this script need the matchit.vim (vimscript#39) to
 be installed. (see also |matchit|)
