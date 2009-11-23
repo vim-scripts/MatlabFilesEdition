@@ -4,6 +4,8 @@
 "		Original authors: Mario Eusebio and Preben Guldberg
 " Last Change:	2008 Oct 16 : added try/catch/rethrow and class statements
 " 		2008 Oct 28 : added highlighting for most of Matlab functions
+" 		2009 Nov 23 : added 'todo' keyword in the matlabTodo keywords 
+" 		(for doxygen support)
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -53,7 +55,7 @@ syn match matlabTransposeOperator	"[])a-zA-Z0-9.]'"lc=1
 syn match matlabSemicolon		";"
 
 syn match matlabComment			"%.*$"	contains=matlabTodo,matlabTab
-syn region matlabBlockComment        start=+%{+    end=+%}+
+syn region matlabBlockComment        start=+%{+    end=+%}+ contains=matlabBlockComment
 
 
 " trigonometric
@@ -305,9 +307,6 @@ syn keyword matlabFunc hdf hdf5 hdf5info hdf5read hdf5write hdfinfo hdfread hdft
 syn keyword matlabFunc multibandread multibandwrite 
 
 
-syn match matlabError	"-\=\<\d\+\.\d\+\.[^*/\\^]"
-syn match matlabError	"-\=\<\d\+\.\d\+[eEdD][-+]\=\d\+\.\([^*/\\^]\)"
-
 " Define the default highlighting.
 " For version 5.7 and earlier: only when not done already
 " For version 5.8 and later: only when an item doesn't have highlighting yet
@@ -331,7 +330,6 @@ if version >= 508 || !exists("did_matlab_syntax_inits")
   HiLink matlabNumber			Number
   HiLink matlabFloat			Float
   HiLink matlabConstant			Constant
-  HiLink matlabError			Error
   HiLink matlabImplicit			matlabStatement
   HiLink matlabStatement		Statement
   HiLink matlabSemicolon		SpecialChar

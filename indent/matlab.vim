@@ -1,14 +1,14 @@
 " Matlab indent file
 " Language:	Matlab
 " Maintainer:	Fabrice Guy <fabrice.guy at gmail dot com>
-" Last Change:	2008 Oct 15 
+" Last Change:	2009 Nov 23 - Added support for if/end block on the same line
 
 " Only load this indent file when no other was loaded.
 if exists("b:did_indent")
   finish
 endif
 let b:did_indent = 1
-let s:onlySubfunctionExists = 0
+let s:functionWithoutEndStatement = 0
 
 setlocal indentexpr=GetMatlabIndent()
 setlocal indentkeys=!,o,O=end,=case,=else,=elseif,=otherwise,=catch
@@ -65,50 +65,60 @@ function GetMatlabIndent()
     let curind = curind + &sw
   endif
   " Add a 'shiftwidth' after classdef, properties, switch, methods, events,
-  " function, if, while, for, otherwise, case, tic, try, catch, else, elseif
-  if getline(plnum) =~ '^\s*\(classdef\|properties\|switch\|methods\|events\|function\|if\|while\|for\|otherwise\|case\|tic\|try\|catch\|else\|elseif\)\>'
+  " function, if, while, for, otherwise, case, try, catch, else, elseif
+  if getline(plnum) =~ '^\s*\(classdef\|properties\|switch\|methods\|events\|function\|if\|while\|for\|otherwise\|case\|try\|catch\|else\|elseif\)\>'
     let curind = curind + &sw
     " In Matlab we have different kind of functions
     " - the main function (the function with the same name than the filename)
     " - the nested functions
     " - the functions defined in methods (for classes)
     " - subfunctions
-    " For the moment the main function (located line 1) doesn't produce any indentation in the
-    " code (default behavior in the Matlab editor) and the other kind of
-    " functions indent the code
+    " Principles for the indentation :
+    " - all the function keywords are indented (corresponding to the
+    "   'indent all functions' in the Matlab Editor)
+    " - if we have only subfonctions (ie if the main function doesn't have
+    "   any mayching end), then each function is dedented
     if getline(plnum)  =~ '^\s*\function\>'
-      " If it is the main function
-      if plnum == 1
+      let pplnum = plnum - 1
+      while pplnum > 1 && (getline(pplnum) =~ '^\s*%')
+	let pplnum = pplnum - 1
+      endwhile
+      " If it is the main function, determine if function has a matching end
+      " or not
+      if pplnum <= 1 
 	" look for a matching end : 
-	" - if we find a matching end everything is fine
-	" - if not, then all other functions are subfunctions
+	" - if we find a matching end everything is fine : end of functions
+	"   will be dedented when 'end' is reached
+	" - if not, then all other functions are subfunctions : 'function'
+	"   keyword has to be dedended
+	let old_lnum = v:lnum
+	let motion = plnum . "gg"
+	execute "normal" . motion
 	normal %
 	if getline(line('.')) =~ '^\s*end'
-	  let s:onlySubfunctionExists = 0
+	  let s:functionWithoutEndStatement = 0
 	else
-	  let s:onlySubfunctionExists = 1
+	  let s:functionWithoutEndStatement = 1
 	endif
 	normal %
-	let curind = curind - &sw
-      else
-	" it is a subfunction without matching end : dedent
-	if s:onlySubfunctionExists
-	  let curind = curind - &sw
-	endif
+	let motion = old_lnum . "gg"
+	execute "normal" . motion
       endif
+    endif
+    " if the for-end block (or while-end) is on the same line : dedent
+    if getline(plnum)  =~ '\<end[,;]*\s*\(%.*\)\?$'
+      let curind = curind - &sw 
     endif
   endif
 
-  " Subtract a 'shiftwidth' on a else, elseif, end, catch, otherwise, case,
-  " toc
-  if getline(v:lnum) =~ '^\s*\(else\|elseif\|end\|catch\|otherwise\|case\|toc\)\>'
+  " Subtract a 'shiftwidth' on a else, elseif, end, catch, otherwise, case
+  if getline(v:lnum) =~ '^\s*\(else\|elseif\|end\|catch\|otherwise\|case\)\>'
     let curind = curind - &sw
   endif
   " No indentation in a subfunction
-  if getline(v:lnum)  =~ '^\s*\function\>' && s:onlySubfunctionExists
+  if getline(v:lnum)  =~ '^\s*\function\>' && s:functionWithoutEndStatement
     let curind = curind - &sw
   endif
-
   " First case after a switch : indent
   if getline(v:lnum) =~ '^\s*case'
     while plnum > 0 && (getline(plnum) =~ '^\s*%' || getline(plnum) =~ '^\s*$')
@@ -124,7 +134,7 @@ function GetMatlabIndent()
   if exists("b:match_words")
     if getline(v:lnum) =~ '^\s*end'
       normal %
-      if getline(line('.')) =~ "switch"
+      if getline(line('.')) =~ '^\s*switch'
 	let curind = curind - &sw
       endif
       normal %

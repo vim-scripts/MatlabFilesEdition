@@ -1,7 +1,8 @@
 " Vim filetype plugin file
 " Language:	matlab
 " Maintainer:	Fabrice Guy <fabrice.guy at gmail dot com>
-" Last Changed: 2008 Oct 16
+" Last Changed: 2009 Nov 23 - Automatic insertion of comment header when new
+" comment inserted
 
 if exists("b:did_ftplugin")
   finish
@@ -10,6 +11,9 @@ let b:did_ftplugin = 1
 
 let s:save_cpo = &cpo
 set cpo-=C
+
+setlocal fo+=croql
+setlocal comments=:%>,:%
 
 if exists("loaded_matchit")
   let s:conditionalEnd = '\(([^()]*\)\@!\<end\>\([^()]*)\)\@!'

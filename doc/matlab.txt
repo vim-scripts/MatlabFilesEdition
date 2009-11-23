@@ -39,10 +39,8 @@ for :
 - mutli-line (lines with line continuation operator (...))
 
 This script has been tested with the Matlab R2008a release on many files and
-the result of indentation compared to the one provided by the Matlab Editor.
-The only differences are :
-- block command on same line (if true, disp('ok'); end) are unsupported in
-  this version
+the result of indentation compared to the one provided by the Matlab Editor
+(using the 'indent all functions' option).
 
 NOTE : to work correctly, this script need the matchit.vim (vimscript#39) to
 be installed. (see also |matchit|)
@@ -64,7 +62,7 @@ exuberant ctags (http://ctags.sourceforge.net ) can construct the tag file :
 you can now jump to tags (using CTRL-] (or CTRL-$ if using Windows) and go
 back again (CTRL-T) See |tags| in vim.
 
-These scipts have been tested using gvim 7.2 and Matlab R2008a on Windows.
+These scripts have been tested using gvim 7.2 and Matlab R2008a on Windows.
 
 ================================================================================
 6. Installation details					 	*matlab-instal*
@@ -81,32 +79,32 @@ The package is matlab.zip : just unzip it to extract the files.
 < is available
 
 - Syntax highlighting 
-  Copy syntax/matlab.vim to your $HOME/vimfile/syntax
+  Copy syntax/matlab.vim to your $HOME/vimfiles/syntax
   directory
 
 - Correct settings in order to use the matchit.vim script
   In your vimrc file, add the following line : >
 	source $VIMRUNTIME/macros/matchit.vim
 <
-  And copy ftplugin/matlab.vim to your $HOME/vimfile/ftplugin directory
+  And copy ftplugin/matlab.vim to your $HOME/vimfiles/ftplugin directory
 
 - Correct indentation 
   In your vimrc file, add the following line : >
 	source $VIMRUNTIME/macros/matchit.vim
 <
-  And copy indent/matlab.vim to your $HOME/vimfile/indent directory
+  And copy indent/matlab.vim to your $HOME/vimfiles/indent directory
 
 - Integration of the mlint Matlab code checker with the :make command
 
   Add the following line to your vimrc file : >
 	autocmd BufEnter *.m    compiler mlint
 <
-  And copy compiler/mlint.vim to your $HOME/vimfile/compiler directory
+  And copy compiler/mlint.vim to your $HOME/vimfiles/compiler directory
 
 - Tag support
 
   Copy the .ctags to your $HOME directory.  And then run the
-  command to create tour tags file : for example : >
+  command to create your tags file : for example : >
 	ctags -R * 
 
 
