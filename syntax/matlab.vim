@@ -33,7 +33,7 @@ syn keyword matlabBoolean		true false
 syn match matlabLineContinuation	"\.\{3}"
 
 " String
-syn region matlabString			start=+'+ end=+'+	oneline
+syn region matlabString			start=+'+ end=+'+	oneline contains=@Spell
 
 " If you don't like tabs
 syn match matlabTab			"\t"
@@ -54,8 +54,8 @@ syn match matlabTransposeOperator	"[])a-zA-Z0-9.]'"lc=1
 
 syn match matlabSemicolon		";"
 
-syn match matlabComment			"%.*$"	contains=matlabTodo,matlabTab
-syn region matlabBlockComment        start=+%{+    end=+%}+ contains=matlabBlockComment
+syn match matlabComment			"%.*$"	contains=matlabTodo,matlabTab,@Spell
+syn region matlabBlockComment        start=+%{+    end=+%}+ contains=matlabBlockComment,@Spell
 
 
 " trigonometric
